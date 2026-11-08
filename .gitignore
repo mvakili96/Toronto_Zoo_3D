@@ -1,0 +1,75 @@
+# Original GIS input packages (keep outside version control).
+/maria/
+/buildings/
+/elevation/
+/data/
+
+# Cached downloads, intermediate data and prepared browser assets.
+/generated/
+/public/assets/
+/public/vendor/
+
+# Reports are reproducible output; retain hand-written Markdown documentation.
+/reports/*
+!/reports/*.md
+
+# These are exported from study-area.json / the downloaded OSM snapshot.
+/config/study-extent.geojson
+/config/zoo-osm-boundary.geojson
+
+# GIS datasets and archives accidentally placed outside the input folders.
+*.tif
+*.tiff
+*.las
+*.laz
+*.shp
+*.shx
+*.dbf
+*.prj
+*.cpg
+*.sbn
+*.sbx
+*.gpkg
+*.gdb/
+*.zip
+*.7z
+*.tar
+*.tar.gz
+*.tgz
+*.f32
+
+# Python environments, bytecode, package/build output and test caches.
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+.coverage.*
+htmlcov/
+/build/
+/dist/
+/node_modules/
+
+# Local credentials, workspace settings and machine-specific state.
+.env
+.env.*
+!.env.example
+!.env.*.example
+/.aws/
+/.agents/
+/.codex/
+/.vscode/
+/.idea/
+
+# Logs, temporary files and operating-system/editor clutter.
+*.log
+*.tmp
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db

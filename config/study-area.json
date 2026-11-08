@@ -1,0 +1,16 @@
+{
+  "name": "Toronto Zoo pilot",
+  "boundary_status": "Approximate study area; not a legal Zoo boundary",
+  "rationale": "Includes Zoo pavilions, entrance, parking and Meadowvale Road connections. No georeferenced official Zoo boundary in supplied files; imagery mosaic boundary is coverage, not Zoo property.",
+  "crs": "EPSG:2952",
+  "bounds": [328500, 4852000, 331500, 4854500],
+  "origin": [330000, 4853250, 100],
+  "terrain_grid_m": 5,
+  "imagery_pixels": [3000, 2500],
+  "vertical_exaggeration": 1,
+  "checkpoints": [
+    {"name":"Main entrance plaza","lonlat":[-79.18240,43.82037]},
+    {"name":"Visitor parking access","lonlat":[-79.18022,43.81972]},
+    {"name":"African Rainforest Pavilion","lonlat":[-79.18397,43.81832]}
+  ]
+}

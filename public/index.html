@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Toronto Zoo · Landscape Explorer</title>
+  <meta name="description" content="Explore the Toronto Zoo and Rouge Valley in a locally prepared, interactive 3D landscape.">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Crect width='40' height='40' rx='10' fill='%231e3a31'/%3E%3Cpath d='M10 30 20 9 30 30H10m4-7h12' fill='none' stroke='%23d5e4aa' stroke-width='2'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="style.css">
+  <script type="importmap">{"imports":{"three":"./vendor/three.module.js"}}</script>
+</head>
+<body>
+  <main id="viewer" aria-label="Interactive 3D map of Toronto Zoo"><canvas id="scene" aria-label="3D terrain, buildings, roads and paths" tabindex="0"></canvas><div id="labels"></div></main>
+  <header class="intro">
+    <div class="eyebrow"><span class="brand-mark">↟</span> FIELD ATLAS <span class="divider"></span> TORONTO / 01</div>
+    <h1>Toronto Zoo<span class="title-dot">.</span></h1>
+    <p>A landscape worth exploring.</p>
+    <div class="pilot"><span class="status-dot"></span> ZOO PILOT <span id="area-label">7.5 km² study area</span></div>
+  </header>
+  <aside class="layers panel" aria-label="Map layers">
+    <div class="panel-heading"><span>Make it your view</span><button id="collapse-layers" class="text-button" aria-label="Collapse layers" aria-expanded="true">−</button></div>
+    <div id="layer-body">
+      <div class="base-switch" role="group" aria-label="Terrain appearance"><button id="neutral" class="active" aria-pressed="true">Landscape</button><button id="imagery" aria-pressed="false">Aerial image</button></div>
+      <p id="image-note" class="subtle">A quiet palette. Real ground elevations.</p>
+      <div id="layer-controls">
+        <label><span><i class="key terrain-key"></i>Terrain</span><input type="checkbox" data-layer="terrain" checked><span class="toggle"></span></label>
+        <label><span><i class="key building-key"></i>Buildings</span><input type="checkbox" data-layer="buildings" checked><span class="toggle"></span></label>
+        <label><span><i class="key road-key"></i>Roads</span><input type="checkbox" data-layer="roads" checked><span class="toggle"></span></label>
+        <label><span><i class="key path-key"></i>Walking paths</span><input type="checkbox" data-layer="paths" checked><span class="toggle"></span></label>
+        <label><span><i class="key water-key"></i>Water</span><input type="checkbox" data-layer="water" checked><span class="toggle"></span></label>
+        <label><span><i class="key parking-key"></i>Parking areas</span><input type="checkbox" data-layer="parking" checked><span class="toggle"></span></label>
+        <label><span><i class="key tree-key"></i>Woodland</span><input type="checkbox" data-layer="woodland" checked><span class="toggle"></span></label>
+        <label><span><i class="key boundary-key"></i>Zoo outline <small>OSM</small></span><input type="checkbox" data-layer="boundary" checked><span class="toggle"></span></label>
+        <label><span><i class="key label-key">A</i>Place labels</span><input type="checkbox" data-layer="labels" checked><span class="toggle"></span></label>
+      </div>
+      <button class="evidence-button" id="open-notes">Sources & scene notes <span>↗</span></button>
+    </div>
+  </aside>
+  <div class="top-right"><span class="live-indicator"></span> EXPLORER <span class="small-divider">/</span> <span id="height-range">90—159 m</span></div>
+  <div class="compass" aria-label="Compass"><span>N</span><svg viewBox="0 0 52 52" id="compass-needle"><path d="m26 7 7 20-7-4-7 4z" fill="#29463a"/><path d="m26 45-7-18 7 4 7-4z" fill="#afbfaf"/></svg></div>
+  <aside class="feature panel" id="feature" hidden aria-live="polite"><button class="close" id="close-feature" aria-label="Close feature details">×</button><div class="eyebrow">IN THE LANDSCAPE</div><h2 id="feature-title"></h2><p id="feature-description"></p><dl id="feature-facts"></dl></aside>
+  <nav class="places panel" aria-label="Explore locations"><span>EXPLORE</span><button data-view="overview" class="active">Overview</button><button data-view="entrance">Entrance</button><button data-view="pavilion">Pavilions</button><button data-view="top">From above</button></nav>
+  <div class="navigation panel" aria-label="Camera controls"><button id="zoom-in" aria-label="Zoom in">+</button><button id="zoom-out" aria-label="Zoom out">−</button><span></span><button id="reset" aria-label="Reset view" title="Reset view (R)">↺</button></div>
+  <div class="map-scale"><div></div><span id="scale-label">200 m</span></div>
+  <div class="interaction-hint" id="hint">Drag to orbit <b>·</b> Right-drag to pan <b>·</b> Scroll to zoom <b>·</b> Click a building</div>
+  <footer><span>TORONTO ZOO & THE ROUGE VALLEY</span><span>Terrain: Ontario <b>·</b> Buildings & aerial: City of Toronto <b>·</b> Routes & context: © OpenStreetMap contributors</span><button id="help">Controls</button></footer>
+  <dialog id="notes"><button class="close" id="close-notes" aria-label="Close scene notes">×</button><div class="eyebrow">ABOUT THIS LANDSCAPE</div><h2>Real sources.<br>Visible assumptions.</h2><p>This is an exploratory model of the Zoo and its immediate surroundings. The rectangular study area is approximate; the dotted Zoo outline comes from OpenStreetMap, not a property survey.</p><div class="notes-grid"><section><h3>The ground</h3><p id="terrain-note">Ontario GTA 2023 lidar terrain, CGVD2013 heights in metres. Displayed without vertical exaggeration.</p></section><section><h3>The buildings</h3><p id="building-note">City of Toronto 2025 Multipatch geometry, with footprint extrusions where the 3D source has gaps. Colours are visualization styling. Click a building to inspect its source.</p></section><section><h3>The routes</h3><p>Maria’s Zoo OSM layers take priority; wider OSM layers supply surrounding routes. Widths are estimated from lanes or documented defaults. Parallel routes are retained. Bridge decks use estimated heights; tunnel interiors are hidden.</p></section><section><h3>The image</h3><p>Cached from Toronto’s open current-year ortho service on November 7, 2026. Capture year is unverified. Maria’s university-licensed 2022 imagery is excluded from browser assets.</p></section></div><label class="comparison"><input type="checkbox" data-layer="comparison"> Show City routes for comparison <small>magenta · generalized centrelines</small></label><p class="note-caption">Woodland shapes are mapped OSM areas; individual trees are decorative placement. Terrain is simplified to a 5 m grid. Building grounding is a visualization adjustment, not a vertical datum conversion.</p><div class="licences"><a href="https://www.ontario.ca/page/open-government-licence-ontario" target="_blank" rel="noreferrer">Ontario licence ↗</a><a href="https://open.toronto.ca/open-data-licence/" target="_blank" rel="noreferrer">Toronto licence ↗</a><a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noreferrer">OSM / ODbL ↗</a></div></dialog>
+  <dialog id="controls-help"><button class="close" id="close-help" aria-label="Close controls">×</button><div class="eyebrow">FIND YOUR WAY</div><h2>Take a closer look.</h2><dl><dt>Orbit</dt><dd>Drag with the left mouse button, or one finger.</dd><dt>Pan</dt><dd>Right-drag, Shift-drag, two fingers, or arrow keys when the map is focused.</dd><dt>Zoom</dt><dd>Scroll, pinch, or use the + / − buttons.</dd><dt>Reset</dt><dd>Press R or the circular arrow.</dd><dt>Inspect</dt><dd>Click a building or a road to see its source.</dd></dl></dialog>
+  <div id="loading" role="status"><div class="loading-mark">↟</div><div class="eyebrow">FIELD ATLAS / TORONTO</div><h2>Finding our place.</h2><p id="load-message">Reading the landscape…</p><div class="loading-bar"><i></i></div></div>
+  <script type="module" src="app.js"></script>
+</body>
+</html>
