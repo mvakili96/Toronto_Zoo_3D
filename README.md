@@ -5,77 +5,35 @@ Toronto Zoo Landscape Explorer
 
 [![Toronto Zoo interactive viewer in aerial mode](docs/demo-preview.webp)](https://mvakili96.github.io/Toronto_Zoo_3D/)
 
-The hosted viewer opens in aerial-image mode with woodland hidden. Orbit, pan, zoom, inspect buildings, switch terrain appearance and toggle layers directly in your browser; no installation is needed. The link becomes available after the first successful GitHub Pages deployment. [Publishing and updating the demo](docs/PUBLISHING.md).
+Explore the Toronto Zoo and its immediate surroundings as an interactive 3D landscape. The pilot covers an approximate 7.5 km² study area, bringing together terrain, aerial imagery, buildings and mapped routes.
 
-A local Three.js app with real terrain, City building massing, OSM roads and paths, optional aerial imagery, camera presets and feature inspection. This working directory has a prepared pilot in `public/assets/`; no network access, Node.js, map API key or GIS software is needed to view it with the existing local assets.
+The demo runs in your browser with no installation. Orbit, pan, zoom, inspect buildings and toggle layers to explore the scene. Aerial imagery is shown by default, and the 3D woodland layer can be switched on.
 
-Git tracks the application source, editable configuration, preparation/download scripts, dependency lists and hand-written documentation. A small, checksummed copy of prepared browser data and pinned viewer libraries is intentionally tracked in `deployment/` so GitHub Pages can publish the same scene. Original datasets, downloads, local `public/assets/` and `public/vendor/`, generated reports and the Python environment are ignored and stay on disk. The exported GeoJSON outlines are also ignored; `config/study-area.json` and `config/context-query.overpass` are tracked. The hand-written vegetation investigation in `reports/VEGETATION_AUDIT.md` is tracked, while its generated evidence remains local.
+How the visualization was created
+----------------------------------
 
-To build the hosted viewer from a normal checkout, without original GIS inputs or extra Python packages:
+1. **Build the terrain.** Elevation samples from Ontario’s digital terrain model (DTM) form the 3D ground surface, including the hills, slopes and valleys around the Zoo.
+2. **Texture the ground.** A georeferenced orthophoto from the City of Toronto provides the terrain’s surface colours and texture.
+3. **Add geographic features.** City building models and mapped roads, paths, water, parking and woodland are placed relative to the terrain using their geographic coordinates. These layers are combined in a Three.js viewer for interactive exploration.
 
-```bash
-python3 scripts/build_site.py
-python3 -m http.server 8000 --bind 127.0.0.1 --directory dist
-```
+Feature positions come from the geographic datasets. No automated image-based alignment or matching is performed. Selected locations were visually checked against the imagery.
 
-Open **http://127.0.0.1:8000**. The commands below are for preparing new geographic data or working with your original local assets.
+Data sources
+-------------
 
-From this directory, launch with:
+| Component | Dataset used |
+|---|---|
+| Terrain | Ontario’s [lidar-derived Digital Terrain Model](https://data.ontario.ca/dataset/ontario-digital-terrain-model-lidar-derived), using the GTA 2023 DTM package covering the Zoo. |
+| Aerial texture | The [City of Toronto orthophoto service](https://gis.toronto.ca/arcgis/rest/services/basemap/cot_ortho/MapServer), cached for the study area on November 7, 2026. The image capture year is unverified. |
+| Buildings | The City of Toronto’s [2025 3D Massing dataset](https://open.toronto.ca/dataset/3d-massing/). Existing 3D building geometry is used where available, with footprint extrusions filling gaps. |
+| Roads and paths | OpenStreetMap extracts for the Zoo and surrounding Toronto. City of Toronto road and pedestrian centrelines are available as a comparison layer. |
+| Woodland, water, parking, place names and Zoo outline | A separate [OpenStreetMap](https://www.openstreetmap.org/copyright) extract for the study area. |
 
-```bash
-python3 scripts/serve.py
-```
+About the representation
+-------------------------
 
-Open **http://127.0.0.1:8000** in a browser with WebGL2. Stop the server with Ctrl+C. It serves only `public/`, so the browser cannot request the source collection.
+Buildings retain simplified massing geometry. The 3D trees are illustrative models placed within mapped woodland areas, with display choices determining their sizes and spacing. Vegetation coverage is incomplete. Feature colours and estimated route widths help make the layers readable.
 
-To rebuild from your original inputs, use Python 3.12 or 3.13:
+Data attribution and terms are available through the [Ontario licence](https://www.ontario.ca/page/open-government-licence-ontario), [Toronto licence](https://open.toronto.ca/open-data-licence/) and [© OpenStreetMap contributors, ODbL](https://www.openstreetmap.org/copyright).
 
-```bash
-python3 -m venv .venv
-.venv/bin/pip install -r requirements.txt
-.venv/bin/python scripts/prepare.py --config config/study-area.json
-.venv/bin/python scripts/validate_data.py
-.venv/bin/python scripts/serve.py
-```
-
-Preparation is offline with the supplied files and the existing `generated/sources/` cache. It scans coverage before loading pixels, selects only overlapping terrain tiles and City Multipatch layers, writes a 2 m working DTM, and produces a 5 m display grid and clipped browser assets. It refuses missing terrain cells. Original inputs are opened read-only.
-
-A checkout containing only Git-tracked files needs the original datasets restored separately under `maria/`, `buildings/` and `elevation/`. After creating the environment and installing `requirements.txt`, run the following to restore the pinned Three.js libraries, download the current imagery/context and generate the browser assets:
-
-```bash
-.venv/bin/python scripts/fetch_public_assets.py
-.venv/bin/python scripts/fetch_context.py
-.venv/bin/python scripts/prepare.py
-```
-
-Those download steps need internet access. Copy the existing ignored `generated/sources/` cache separately to preserve the exact imagery/context snapshot instead of obtaining newer service data. Generated screenshots and reports linked below are local evidence files, not part of the Git baseline.
-
-Edit [config/study-area.json](config/study-area.json) to change the study bounds, origin, display resolution or alignment checkpoints. Bounds use NAD83(CSRS) / MTM zone 10, EPSG:2952, in metres. Width and height must be multiples of the display-grid spacing. [config/study-extent.geojson](config/study-extent.geojson) is a WGS84 export for inspection; edit the JSON configuration as the source of truth. [config/zoo-osm-boundary.geojson](config/zoo-osm-boundary.geojson) is the separate mapped OSM Zoo outline.
-
-If the imagery extent changes, the old crop is disabled automatically. To fetch a replacement from the open City service, or restore vendored Three.js files:
-
-```bash
-.venv/bin/python scripts/fetch_public_assets.py --refresh-imagery
-.venv/bin/python scripts/prepare.py
-```
-
-That optional step needs internet access and records the request. It does not download a new terrain package. `scripts/fetch_context.py` refreshes the optional OSM context using the query in `config/context-query.overpass`. Change that query when expanding the study area. Keep `generated/sources/` if you want to reproduce this exact image/context snapshot; the current services can change.
-
-Browser verification can be repeated against the running server:
-
-```bash
-.venv/bin/pip install -r requirements-test.txt
-.venv/bin/playwright install chromium
-.venv/bin/python scripts/browser_check.py
-```
-
-This session used Chromium with software WebGL. On this Ubuntu 20 host the browser installer needed `PLAYWRIGHT_HOST_PLATFORM_OVERRIDE=ubuntu22.04-x64` and `PLAYWRIGHT_BROWSERS_PATH=/tmp/toronto-zoo-browser`; these are environment workarounds, not app requirements.
-
-Read [HANDOFF.md](HANDOFF.md) for source choices, problems encountered, evidence and remaining limitations. Useful evidence files:
-
-- Current water/parking categories and palette: [overview](reports/water-parking-overview.png), [entrance close-up](reports/water-parking-close-up.png), [aerial view](reports/water-parking-imagery.png). Road/path palette close-ups: [landscape](reports/roads-paths-close-up.png), [aerial](reports/roads-paths-imagery.png). Initial capture: [phone layout](reports/mobile.png).
-- [Three alignment checkpoints](reports/alignment-checkpoints.png) and [visual review](reports/alignment-review.json).
-- [Data audit](reports/data-audit.json), [terrain tile index](reports/terrain-tile-index.json), [Multipatch coverage](reports/multipatch-coverage.json), [building grounding](reports/building-grounding.json), [route widths](reports/route-widths.json).
-- [Data checks](reports/data-verification.json), [browser checks and loaded bytes](reports/browser-verification.json), [asset sizes and hashes](reports/asset-manifest.json).
-
-The preparation pipeline can support another extent; the viewer’s Zoo labels and camera presets are specific to this pilot. A Toronto-wide release needs streamed spatial tiles and levels of detail, more terrain coverage, a confirmed building vertical reference, and a larger validation sample before serving the full city.
+For setup and reproducibility, see the [developer guide](docs/DEVELOPMENT.md). Further source decisions and validation are documented in the [technical handoff](HANDOFF.md).
