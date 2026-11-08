@@ -318,11 +318,15 @@ async function init() {
     const [elev,bpos,bcol]=await Promise.all([request(data.terrain.url,true),request(data.buildings.url,true),request(data.buildings.colors,true)]);heights=elev;
     const mask=makeTerrain();makeBuildings(bpos,bcol);loadMessage.textContent='Connecting roads and paths…';
     await new Promise(resolve=>setTimeout(resolve,20));makeRoutes();makeContext();makeWoodland(mask);makeLabels();
+    setLayer('woodland',false);
     state.layers.labels=true;bindControls();
     $('#area-label').textContent=`${data.summary.study_area_km2} km² study area`;$('#height-range').textContent=`${Math.round(data.terrain.range[0])}—${Math.round(data.terrain.range[1])} m`;
     $('#terrain-note').textContent=`Ontario GTA 2023 lidar terrain from ${data.summary.terrain_tiles} local tiles. CGVD2013 heights in metres; ${data.terrain.step} m display grid, no vertical exaggeration.`;
     $('#building-note').textContent=`${data.summary.multipatches.toLocaleString()} City 2025 Multipatch buildings and ${data.summary.extrusions} footprint extrusions. ${data.summary.estimated_heights} default height estimates. Colours are visualization styling. Click a building for its source.`;
-    if(!data.imagery){$('#imagery').disabled=true;$('#imagery').title='A licensed georeferenced image crop is needed for this extent.';}
+    if(data.imagery){
+      loadMessage.textContent='Loading the aerial image…';
+      await setImagery(true);
+    }else{$('#imagery').disabled=true;$('#imagery').title='A licensed georeferenced image crop is needed for this extent.';}
     setView('overview',true);animate(performance.now());state.ready=true;$('#loading').classList.add('done');setTimeout(()=>$('#loading').hidden=true,650);
     // Small, read-only QA interface plus the same actions exposed in the UI.
     function routeClearanceAudit(){const report={samples:0,minimumM:Infinity,maximumM:-Infinity,buriedSamples:0};for(const obj of pickable){const kind=obj.userData.kind;if(!['roads','paths'].includes(kind))continue;const pos=obj.geometry.attributes.position.array;for(const range of routeRanges[kind]){if(range.route.bridge)continue;for(let v=range.first;v<range.first+range.count;v+=3){const a=v*3,b=(v+1)*3,c=(v+2)*3,x=(pos[a]+pos[b]+pos[c])/3,z=(pos[a+2]+pos[b+2]+pos[c+2])/3,y=(pos[a+1]+pos[b+1]+pos[c+1])/3,clearance=y-ground(x,-z);report.samples++;report.minimumM=Math.min(report.minimumM,clearance);report.maximumM=Math.max(report.maximumM,clearance);if(clearance<-.01)report.buriedSamples++;}}}return report;}
