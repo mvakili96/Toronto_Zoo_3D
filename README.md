@@ -1,9 +1,24 @@
 Toronto Zoo Landscape Explorer
 =============================
 
+[**Open the interactive 3D demo →**](https://mvakili96.github.io/Toronto_Zoo_3D/)
+
+[![Toronto Zoo interactive viewer in aerial mode](docs/demo-preview.webp)](https://mvakili96.github.io/Toronto_Zoo_3D/)
+
+The hosted viewer opens in aerial-image mode with woodland hidden. Orbit, pan, zoom, inspect buildings, switch terrain appearance and toggle layers directly in your browser; no installation is needed. The link becomes available after the first successful GitHub Pages deployment. [Publishing and updating the demo](docs/PUBLISHING.md).
+
 A local Three.js app with real terrain, City building massing, OSM roads and paths, optional aerial imagery, camera presets and feature inspection. This working directory has a prepared pilot in `public/assets/`; no network access, Node.js, map API key or GIS software is needed to view it with the existing local assets.
 
-Git tracks the application source, editable configuration, preparation/download scripts, dependency lists and hand-written documentation. Original datasets, downloads, vendored libraries, generated assets, generated reports and the Python environment are ignored and stay on disk. The exported GeoJSON outlines are also ignored; `config/study-area.json` and `config/context-query.overpass` are tracked. The hand-written vegetation investigation in `reports/VEGETATION_AUDIT.md` is tracked, while its generated evidence remains local.
+Git tracks the application source, editable configuration, preparation/download scripts, dependency lists and hand-written documentation. A small, checksummed copy of prepared browser data and pinned viewer libraries is intentionally tracked in `deployment/` so GitHub Pages can publish the same scene. Original datasets, downloads, local `public/assets/` and `public/vendor/`, generated reports and the Python environment are ignored and stay on disk. The exported GeoJSON outlines are also ignored; `config/study-area.json` and `config/context-query.overpass` are tracked. The hand-written vegetation investigation in `reports/VEGETATION_AUDIT.md` is tracked, while its generated evidence remains local.
+
+To build the hosted viewer from a normal checkout, without original GIS inputs or extra Python packages:
+
+```bash
+python3 scripts/build_site.py
+python3 -m http.server 8000 --bind 127.0.0.1 --directory dist
+```
+
+Open **http://127.0.0.1:8000**. The commands below are for preparing new geographic data or working with your original local assets.
 
 From this directory, launch with:
 

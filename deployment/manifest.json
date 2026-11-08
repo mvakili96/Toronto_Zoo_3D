@@ -1,0 +1,120 @@
+{
+  "format_version": 1,
+  "snapshot_utc": "2026-11-08T17:11:24.325641+00:00",
+  "study": {
+    "name": "Toronto Zoo pilot",
+    "boundary_status": "Approximate study area; not a legal Zoo boundary",
+    "rationale": "Includes Zoo pavilions, entrance, parking and Meadowvale Road connections. No georeferenced official Zoo boundary in supplied files; imagery mosaic boundary is coverage, not Zoo property.",
+    "crs": "EPSG:2952",
+    "bounds": [
+      328500,
+      4852000,
+      331500,
+      4854500
+    ],
+    "origin": [
+      330000,
+      4853250,
+      100
+    ],
+    "terrain_grid_m": 5,
+    "imagery_pixels": [
+      3000,
+      2500
+    ],
+    "vertical_exaggeration": 1,
+    "checkpoints": [
+      {
+        "name": "Main entrance plaza",
+        "lonlat": [
+          -79.1824,
+          43.82037
+        ]
+      },
+      {
+        "name": "Visitor parking access",
+        "lonlat": [
+          -79.18022,
+          43.81972
+        ]
+      },
+      {
+        "name": "African Rainforest Pavilion",
+        "lonlat": [
+          -79.18397,
+          43.81832
+        ]
+      }
+    ]
+  },
+  "imagery": {
+    "url": "assets/ortho.webp",
+    "source": "City of Toronto current ortho service",
+    "vintage": "Service says current year; capture year unverified",
+    "retrieved": "2026-11-07",
+    "bounds": [
+      328500,
+      4852000,
+      331500,
+      4854500
+    ],
+    "crs": "EPSG:2952",
+    "pixels": [
+      3000,
+      2500
+    ],
+    "licence": "Open Government Licence \u2013 Toronto",
+    "request": "https://gis.toronto.ca/arcgis/rest/services/basemap/cot_ortho/MapServer/export?f=image&bbox=328500%2C4852000%2C331500%2C4854500&bboxSR=2952&imageSR=2952&size=3000%2C2500&format=jpg&dpi=96&transparent=false"
+  },
+  "summary": {
+    "multipatches": 1753,
+    "extrusions": 67,
+    "routes": 910,
+    "terrain_tiles": 12,
+    "terrain_coverage_percent": 100.0,
+    "estimated_heights": 0,
+    "study_area_km2": 7.5
+  },
+  "sources": {
+    "terrain": "Ontario GTA 2023 DTM, CGVD2013; prepared 5 m display grid",
+    "buildings": "City of Toronto 2025 3D Massing",
+    "routes_and_context": "OpenStreetMap snapshots; Maria's Zoo/City OSM layers",
+    "imagery": "City of Toronto open ortho service; university imagery excluded",
+    "viewer_library": "Three.js 0.170.0, MIT; licence included"
+  },
+  "files": {
+    "assets/scene.json": {
+      "bytes": 2916790,
+      "sha256": "1976489404d572b29e48b30f30a2951a2d28a37548d8ad1826b95190878c8083"
+    },
+    "assets/terrain.f32": {
+      "bytes": 1204404,
+      "sha256": "7c7a44a26a43c41b62dd1d23029c72e5ab62beb3ec0ec645f18882f49b82600a"
+    },
+    "assets/buildings.f32": {
+      "bytes": 2402640,
+      "sha256": "fc39c5fe7a99cf579b0b391dea72c0809800fc3498a61d336b0b2f21eeb6fcc6"
+    },
+    "assets/building-colors.f32": {
+      "bytes": 2402640,
+      "sha256": "a78698420a579ee75fbd56109d7800302134583d265ff004cf6b89eb348f7718"
+    },
+    "assets/ortho.webp": {
+      "bytes": 3266494,
+      "sha256": "7c269e224f0a7a02c069fefe4925d1c5dda5a4ded447f060ce6c4d5f0f3e3ecf"
+    },
+    "vendor/three.module.js": {
+      "bytes": 1314681,
+      "sha256": "ce1fa418de16a19495a9f72495580e3015d7745c296d3ce0485897f902ddedfb"
+    },
+    "vendor/OrbitControls.js": {
+      "bytes": 32134,
+      "sha256": "80efaadea4f8a636a65fb0bd08bfef62f3d93a0bb94e2e7500f23176c5c07f4e"
+    },
+    "vendor/THREE-LICENSE.txt": {
+      "bytes": 1081,
+      "sha256": "4c40a1ef62450b857c3b2aaf294936304cd552d965fbcd9d32d4c5bcf4ba4454"
+    }
+  },
+  "total_bytes": 13540864
+}

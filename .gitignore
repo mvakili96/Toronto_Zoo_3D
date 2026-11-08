@@ -38,6 +38,11 @@
 *.tgz
 *.f32
 
+# Small, explicit browser-data snapshot required by the hosted Zoo demo.
+!/deployment/assets/building-colors.f32
+!/deployment/assets/buildings.f32
+!/deployment/assets/terrain.f32
+
 # Python environments, bytecode, package/build output and test caches.
 .venv/
 venv/

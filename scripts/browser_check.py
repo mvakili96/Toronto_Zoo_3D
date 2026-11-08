@@ -3,29 +3,40 @@
 PLAYWRIGHT_BROWSERS_PATH=/tmp/toronto-zoo-browser python scripts/browser_check.py
 """
 from pathlib import Path
-import json, time
+from urllib.parse import urljoin
+import argparse, json, time
 from playwright.sync_api import sync_playwright
 
 ROOT=Path(__file__).resolve().parents[1]
-out=ROOT/'reports';out.mkdir(exist_ok=True)
+parser=argparse.ArgumentParser(description=__doc__)
+parser.add_argument('--url',default='http://127.0.0.1:8000/',help='Viewer URL, including any GitHub Pages project path.')
+parser.add_argument('--output-dir',type=Path,default=ROOT/'reports',help='Directory for screenshots and verification JSON.')
+args=parser.parse_args()
+out=args.output_dir;out.mkdir(parents=True,exist_ok=True)
 with sync_playwright() as p:
     browser=p.chromium.launch(headless=True,args=['--no-sandbox','--enable-unsafe-swiftshader','--use-angle=swiftshader'])
     page=browser.new_page(viewport={'width':1440,'height':1000},device_scale_factor=1)
-    errors=[];responses=[]
+    errors=[];console_errors=[];responses=[]
     page.on('pageerror',lambda e:errors.append(str(e)))
+    page.on('console',lambda m:console_errors.append(m.text) if m.type=='error' else None)
     page.on('response',lambda r:responses.append({'url':r.url,'status':r.status}))
     print('Opening local app...',flush=True)
-    page.goto('http://127.0.0.1:8000',wait_until='networkidle',timeout=60000)
+    page.goto(args.url,wait_until='networkidle',timeout=60000)
     page.wait_for_function('window.zoo?.state.ready',timeout=120000)
     page.wait_for_timeout(1600)
     print('READY',page.evaluate('zoo.snapshot()'),flush=True)
     page.screenshot(path=str(out/'overview.png'),timeout=60000)
     print('Saved overview',flush=True)
     report={'overview':page.evaluate('zoo.snapshot()'),'errors':errors,'responses':responses,'checks':[]}
+    report['initial_resources']=page.evaluate('performance.getEntriesByType("resource").map(r=>({name:r.name,bytes:r.decodedBodySize}))')
+    report['document_bytes']=page.evaluate('performance.getEntriesByType("navigation")[0].decodedBodySize')
+    report['initial_body_bytes']=report['document_bytes']+sum(r['bytes'] for r in report['initial_resources'])
     def check(name,passed,details=None):
         report['checks'].append({'name':name,'passed':bool(passed),'details':details})
         print(('PASS ' if passed else 'FAIL ')+name,flush=True)
         assert passed, (name,details)
+    check('Aerial imagery is the default when available',page.evaluate('zoo.state.imagery === Boolean(zoo.data.imagery)'))
+    check('Woodland starts hidden',not page.evaluate('zoo.state.layers.woodland') and not page.locator('input[data-layer="woodland"]').is_checked())
     original=page.evaluate('zoo.snapshot()')
     # Exercise real pointer controls on an unobstructed piece of canvas.
     page.mouse.move(1020,560);page.mouse.down();page.mouse.move(1140,590,steps=12);page.mouse.up();page.wait_for_timeout(700)
@@ -57,16 +68,17 @@ with sync_playwright() as p:
     page.screenshot(path=str(out/'close-up-imagery.png'),timeout=60000)
     page.click('[data-view="entrance"]');page.wait_for_timeout(1500);page.screenshot(path=str(out/'entrance-imagery.png'),timeout=60000)
     page.click('#neutral');page.wait_for_function('!zoo.state.imagery');check('Neutral terrain restored',not page.evaluate('zoo.state.imagery'))
-    page.click('[data-view="top"]');page.wait_for_timeout(1500);check('Top view works',page.evaluate('zoo.snapshot().camera[1]')>3900)
+    page.click('[data-view="top"]');page.wait_for_function('zoo.snapshot().camera[1]>3900',timeout=30000);check('Top view works',page.evaluate('zoo.snapshot().camera[1]')>3900)
     # Actual HTTP resource sizes, including optional imagery loaded by the test.
     report['resources']=page.evaluate('performance.getEntriesByType("resource").map(r=>({name:r.name,bytes:r.decodedBodySize,transferBytes:r.transferSize,durationMs:r.duration}))')
     report['loaded_resource_bytes']=sum(r['bytes'] for r in report['resources'])
-    report['document_bytes']=(ROOT/'public/index.html').stat().st_size
     report['total_body_bytes_with_document']=report['loaded_resource_bytes']+report['document_bytes']
-    report['initial_body_bytes']=report['total_body_bytes_with_document']-sum(r['bytes'] for r in report['resources'] if r['name'].endswith('ortho.webp'))
-    check('All runtime resources come from the local server',all(r['name'].startswith('http://127.0.0.1:8000/') for r in report['resources']))
+    base_url=urljoin(page.url,'.')
+    check('All runtime resources stay under the viewer URL',all(r['name'].startswith(base_url) for r in report['resources']))
+    check('All viewer requests succeeded',all(r['status']<400 for r in responses))
     report['errors']=errors
-    check('No browser JavaScript errors',not errors,errors)
+    report['console_errors']=console_errors
+    check('No browser JavaScript or shader errors',not errors and not console_errors,{'page':errors,'console':console_errors})
     report['route_clearance']=page.evaluate('zoo.routeClearanceAudit()')
     check('Road and path triangle centers remain above terrain',report['route_clearance']['buriedSamples']==0,report['route_clearance'])
     # Phone viewport: collapse the layers and use the same camera/layer actions.

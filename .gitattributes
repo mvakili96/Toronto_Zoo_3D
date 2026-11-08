@@ -1,0 +1,5 @@
+# Keep prepared snapshots out of the default source-code diff.
+deployment/assets/* linguist-generated=true
+
+# Pinned upstream libraries retain their exact bytes, including whitespace.
+deployment/vendor/* linguist-vendored=true -whitespace
