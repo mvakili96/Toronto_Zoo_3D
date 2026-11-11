@@ -5,6 +5,9 @@ The [project README](../README.md) introduces the visualization and its data sou
 This guide covers local setup, data preparation and verification. For GitHub Pages,
 see [publishing and updating the demo](PUBLISHING.md).
 
+A separate [local Google 3D preview](GOOGLE_3D_PREVIEW.md) is available for testing
+Google's photorealistic scene with a Maps Demo Key.
+
 Run the prepared demo locally
 -----------------------------
 

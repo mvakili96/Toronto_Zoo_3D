@@ -1,0 +1,26 @@
+{
+  "source_crs": "EPSG:2952",
+  "source_bounds": [328500, 4852000, 331500, 4854500],
+  "bounds": {
+    "south": 43.80749145254727,
+    "west": -79.20543559408813,
+    "north": 43.83009607875573,
+    "east": -79.1680244757132
+  },
+  "overview": {
+    "center": {"lat": 43.8187937656515, "lng": -79.18673003490066, "altitude": 180},
+    "range": 1700,
+    "tilt": 45,
+    "heading": 15
+  },
+  "navigation": {
+    "min_range_m": 120,
+    "max_range_m": 2400,
+    "max_tilt_deg": 60,
+    "max_altitude_m": 2800
+  },
+  "checkpoint_altitudes": {
+    "Main entrance plaza": 145,
+    "African Rainforest Pavilion": 160
+  }
+}

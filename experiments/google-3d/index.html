@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <title>Toronto Zoo · Google 3D preview</title>
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main id="map" aria-label="Google photorealistic 3D view of Toronto Zoo"></main>
+  <aside class="panel">
+    <p class="eyebrow">FIELD ATLAS / LOCAL PREVIEW</p>
+    <h1>Toronto Zoo<span>.</span></h1>
+    <p class="intro">Explore the same study area as the GIS demo.</p>
+    <nav aria-label="Explore the Zoo">
+      <button data-view="overview" disabled>Overview</button>
+      <button data-view="entrance" disabled>Entrance area</button>
+      <button data-view="pavilion" disabled>Rainforest Pavilion</button>
+      <button data-view="top" disabled>From above</button>
+    </nav>
+    <div class="camera-controls" aria-label="Camera controls">
+      <button id="zoom-out" aria-label="Zoom out" disabled>−</button>
+      <button id="zoom-in" aria-label="Zoom in" disabled>+</button>
+      <button id="reset" disabled>Reset view</button>
+    </div>
+    <label class="labels"><span>Map labels</span><input id="labels" type="checkbox" disabled></label>
+    <button id="orbit" class="orbit" aria-pressed="false" disabled>Orbit this view</button>
+    <p class="hint">Drag and zoom within the Zoo study area, or choose a viewpoint.</p>
+    <p class="source">Navigation is limited to the GIS demo’s 3 × 2.5 km study area. Google may still draw scenery beyond its edges.</p>
+  </aside>
+  <div id="status" class="status" role="status" aria-live="polite">Checking local configuration…</div>
+  <section id="message" class="message" hidden>
+    <p class="eyebrow">GOOGLE 3D PREVIEW</p>
+    <h2 id="message-title"></h2>
+    <p id="message-text"></p>
+    <button id="retry">Check again</button>
+  </section>
+  <script type="module" src="app.js"></script>
+</body>
+</html>
