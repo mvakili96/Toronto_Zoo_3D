@@ -8,6 +8,9 @@ on:
       - 'deployment/**'
       - 'config/study-area.json'
       - 'scripts/build_site.py'
+      - 'scripts/google_3d_config.py'
+      - 'experiments/google-3d/**'
+      - 'config/google-3d-preview.json'
       - '.github/workflows/pages.yml'
   workflow_dispatch:
 
@@ -29,6 +32,8 @@ jobs:
         with:
           python-version: '3.12'
       - name: Verify snapshot and build the static viewer
+        env:
+          GOOGLE_MAPS_API_KEY: ${{ secrets.GOOGLE_MAPS_API_KEY }}
         run: python scripts/build_site.py
       - name: Upload only the prepared website
         uses: actions/upload-pages-artifact@v4

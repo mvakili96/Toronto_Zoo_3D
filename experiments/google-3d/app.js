@@ -38,6 +38,7 @@ function status(text, phase) {
 }
 function message(title, text, phase = 'error') {
   clearTimeout(loadTimer);
+  $('#launch').hidden = true;
   status(title, phase);
   $('#message-title').textContent = title;
   $('#message-text').textContent = text;
@@ -85,18 +86,14 @@ function loadGoogle(key) {
   });
 }
 
-async function init() {
-  $('#retry').onclick = () => location.reload();
-  window.gm_authFailure = () => message('Google could not accept this key',
-    'Check that the Demo Key supports Maps JavaScript API and that its daily quota is available. If you set website restrictions, allow this localhost address, then reload.');
+async function startGoogle() {
+  if (state.phase !== 'awaiting-click') return;
+  $('#launch').hidden = true;
+  $('#load-google').disabled = true;
+  window.gm_authFailure = () => message('Google 3D is currently unavailable', config.hosted
+    ? 'Google could not authorize this view. The shared daily quota or website access settings may be responsible. Try again after the next daily reset, or open the GIS-based demo.'
+    : 'Check the key’s Maps JavaScript API access, daily quota and website restrictions for this localhost address. The GIS-based demo is also available.');
   try {
-    const response = await fetch('config.json', {cache:'no-store'});
-    config = await response.json();
-    if (!response.ok) throw new Error('The preview configuration could not be loaded. Check the study and Google preview configuration files.');
-    if (!config.configured) {
-      message('Add your Google Demo Key', 'Save this line in the project’s .env file:\nGOOGLE_MAPS_API_KEY=your_key_here\n\nThen choose Check again.', 'missing-key');
-      return;
-    }
     status('Connecting to Google 3D…', 'loading');
     loadTimer = setTimeout(() => {
       if (!firstRender && state.phase !== 'error') status('Google is still loading the 3D scene. Please wait…', 'loading');
@@ -115,7 +112,7 @@ async function init() {
       map.addEventListener(event, scheduleCameraConstraint);
     }
     map.addEventListener('gmp-error', () => message('The Google 3D map could not initialize',
-      'Try a current browser with WebGL enabled. Also check that your Google key is valid and has quota available, then reload.'));
+      'Try a current browser with WebGL enabled. Google access or the shared daily quota may also be unavailable. You can open the GIS-based demo instead.'));
     map.addEventListener('gmp-steadychange', e => {
       state.steady = Boolean(e.isSteady);
       if (e.isSteady && state.phase !== 'error') {
@@ -148,7 +145,28 @@ async function init() {
   } catch (error) {
     message('Could not open Google 3D', error.message?.includes('internet connection')
       ? 'Google Maps could not be reached. Check your internet connection, then reload.'
-      : 'Check the local preview configuration and Google key, then reload. Your key is never shown in this page.');
+      : 'Google 3D is currently unavailable. Access settings, the shared daily quota or browser support may be responsible. You can use the GIS-based demo instead.');
+  }
+}
+async function init() {
+  $('#retry').onclick = () => location.reload();
+  $('#load-google').onclick = startGoogle;
+  try {
+    const response = await fetch('config.json', {cache:'no-store'});
+    if (!response.ok) throw new Error('Configuration unavailable');
+    config = await response.json();
+    document.querySelectorAll('.gis-link').forEach(link => link.href = config.gisUrl);
+    if (!config.configured) {
+      message(config.hosted ? 'Google 3D is not available yet' : 'Add your Google Demo Key', config.hosted
+        ? 'The site owner has not configured Google access for this evaluation. You can still explore the GIS-based demo without a Google key.'
+        : 'Save this line in the project’s .env file:\nGOOGLE_MAPS_API_KEY=your_key_here\n\nThen choose Check again.', 'missing-key');
+      return;
+    }
+    status('Google 3D · Open when ready', 'awaiting-click');
+    $('#load-google').disabled = false;
+  } catch {
+    message('This Google view is currently unavailable',
+      'The page configuration could not be loaded. You can open the GIS-based demo instead.');
   }
 }
 init();

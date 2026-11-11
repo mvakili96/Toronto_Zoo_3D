@@ -1,4 +1,4 @@
-"""Package the exact Zoo viewer for static hosting, using only the standard library.
+"""Package the GIS viewer and Google evaluation using only the standard library.
 
 Normal builds use the committed deployment snapshot, not local GIS inputs or
 ignored public assets. --refresh-data explicitly replaces that small snapshot
@@ -8,12 +8,15 @@ import argparse
 from datetime import datetime, timezone
 import hashlib
 import json
+import os
 from pathlib import Path
 import shutil
+from google_3d_config import view_settings
 
 ROOT = Path(__file__).resolve().parents[1]
 SNAPSHOT = ROOT / "deployment"
 APP_FILES = ("index.html", "app.js", "style.css")
+GOOGLE_FILES = tuple("google-3d/" + name for name in (*APP_FILES, "config.json"))
 DATA_FILES = (
     "assets/scene.json",
     "assets/terrain.f32",
@@ -122,10 +125,10 @@ def build_site(output):
     manifest = verify_snapshot()
     output = output.resolve()
     # Do not overwrite a source/input directory or an ancestor of this checkout.
-    protected = ("public", "deployment", "maria", "buildings", "elevation", "config", "scripts", ".git")
+    protected = ("public", "deployment", "maria", "buildings", "elevation", "config", "scripts", "experiments", ".git")
     if ROOT.is_relative_to(output) or any(output.is_relative_to(ROOT / p) for p in protected):
         raise ValueError("Choose dist/ or a separate empty directory for the build.")
-    expected = set(APP_FILES) | set(DATA_FILES) | {".nojekyll", "deployment-manifest.json"}
+    expected = set(APP_FILES) | set(DATA_FILES) | set(GOOGLE_FILES) | {".nojekyll", "deployment-manifest.json"}
     if output.exists():
         if output.is_symlink():
             raise ValueError("Output must be an ordinary directory.")
@@ -134,6 +137,14 @@ def build_site(output):
             raise ValueError(f"Output contains unrelated files; choose an empty directory: {sorted(extra)}")
     for name in APP_FILES:
         fingerprint(ROOT / "public" / name)
+        fingerprint(ROOT / "experiments/google-3d" / name)
+    # Static hosting needs a browser-visible key. Read only the explicitly
+    # supplied build environment, never the developer's ignored .env file.
+    key = os.environ.get("GOOGLE_MAPS_API_KEY", "").strip()
+    if key and (len(key) < 20 or any(c.isspace() for c in key)):
+        raise ValueError("GOOGLE_MAPS_API_KEY is not a valid browser key. The value has not been logged.")
+    google_config = {**view_settings(), "configured": bool(key), "apiKey": key,
+                     "hosted": True, "gisUrl": "../"}
     output.mkdir(parents=True, exist_ok=True)
     for name, source in [(n, ROOT / "public" / n) for n in APP_FILES] + [(n, SNAPSHOT / n) for n in DATA_FILES]:
         target = output / name
@@ -141,15 +152,29 @@ def build_site(output):
             raise ValueError(f"Output paths must not be symlinks: {target}")
         target.parent.mkdir(parents=True, exist_ok=True)
         shutil.copyfile(source, target)
+    for name in APP_FILES:
+        target = output / "google-3d" / name
+        if target.is_symlink() or target.parent.is_symlink():
+            raise ValueError("Google view output paths must not be symlinks.")
+        target.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copyfile(ROOT / "experiments/google-3d" / name, target)
+    config_path = output / "google-3d/config.json"
+    if config_path.is_symlink():
+        raise ValueError("Google view configuration must not be a symlink.")
+    write_json(config_path, google_config)
     (output / ".nojekyll").write_text("")
-    files = {name: fingerprint(output / name) for name in (*APP_FILES, *DATA_FILES)}
+    files = {name: fingerprint(output / name) for name in (*APP_FILES, *DATA_FILES, *GOOGLE_FILES)}
     write_json(output / "deployment-manifest.json", {
         "snapshot_utc": manifest["snapshot_utc"], "study": manifest["study"],
         "sources": manifest["sources"], "files": files,
+        "google_view": {"path": "google-3d/", "configured": bool(key),
+                        "source": "Google Maps JavaScript API, streamed on visitor request",
+                        "purpose": "Evaluation only, shared daily Demo Key quota"},
         "total_bytes": sum(item["bytes"] for item in files.values()),
     })
     print(f"Built {output}: {len(expected)} files, "
           f"{sum(p.stat().st_size for p in output.rglob('*') if p.is_file()):,} bytes.")
+    print("Google 3D evaluation: " + ("browser key supplied." if key else "no key supplied, availability page only."))
 
 
 def main():

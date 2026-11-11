@@ -24,12 +24,18 @@ nav button.active:hover {background:#2f503d;color:white}
 .orbit[aria-pressed=true]:hover {background:#2f503d}
 .hint,.source {font-size:11px;line-height:1.7;color:#6d7c67}
 .source {border-top:1px solid #dce3d4;padding-top:14px;margin-bottom:0;font-size:10px}
+.quota {font-size:11px;line-height:1.7;background:#eef0df;border-radius:9px;padding:12px;color:#47583c}
+a {color:#2f503d;text-underline-offset:3px}
+a:focus-visible {outline:3px solid #92a67c;outline-offset:3px}
 .status {position:absolute;top:24px;right:24px;padding:12px 17px;max-width:calc(100vw - 380px);background:#fbfcf4ed;border-radius:30px;font-size:11px;box-shadow:0 4px 24px #162d221a}
 .status[data-state=ready]::before {content:"";display:inline-block;width:7px;height:7px;border-radius:50%;background:#668956;margin-right:8px}
 .message {position:fixed;left:50%;top:50%;transform:translate(-35%,-50%);padding:30px;max-width:450px;width:calc(100vw - 40px);background:#fbfcf5;border-radius:18px;box-shadow:0 12px 70px #172c2330}
 .message h2 {font-size:24px;font-weight:500;margin:0 0 14px}
 .message p:not(.eyebrow) {font-size:13px;line-height:1.8;white-space:pre-line;color:#62745e}
 .message button {background:#2f503d;color:white;padding:12px 20px}
+.message .alternate {display:block;font-size:12px;margin-top:16px;line-height:1.7}
+.message .fine-print {font-size:10px;margin-bottom:0}
+.launch {max-height:calc(100dvh - 30px);overflow:auto}
 [hidden] {display:none!important}
 @media(max-width:700px) {
   .panel {left:12px;top:12px;width:240px;padding:18px;max-height:calc(100vh - 100px)}

@@ -4,14 +4,14 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="referrer" content="strict-origin-when-cross-origin">
-  <title>Toronto Zoo · Google 3D preview</title>
+  <title>Toronto Zoo · Google 3D evaluation</title>
   <link rel="icon" href="data:,">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
   <main id="map" aria-label="Google photorealistic 3D view of Toronto Zoo"></main>
   <aside class="panel">
-    <p class="eyebrow">FIELD ATLAS / LOCAL PREVIEW</p>
+    <p class="eyebrow">FIELD ATLAS / GOOGLE 3D EVALUATION</p>
     <h1>Toronto Zoo<span>.</span></h1>
     <p class="intro">Explore the same study area as the GIS demo.</p>
     <nav aria-label="Explore the Zoo">
@@ -27,15 +27,25 @@
     </div>
     <label class="labels"><span>Map labels</span><input id="labels" type="checkbox" disabled></label>
     <button id="orbit" class="orbit" aria-pressed="false" disabled>Orbit this view</button>
+    <p class="quota"><strong>Shared daily quota</strong><br>This evaluation may pause until the next daily reset if the Google Demo Key limit is reached. <a class="gis-link" href="../">Open the GIS demo</a> at any time.</p>
     <p class="hint">Drag and zoom within the Zoo study area, or choose a viewpoint.</p>
     <p class="source">Navigation is limited to the GIS demo’s 3 × 2.5 km study area. Google may still draw scenery beyond its edges.</p>
   </aside>
   <div id="status" class="status" role="status" aria-live="polite">Checking local configuration…</div>
+  <section id="launch" class="message launch" aria-labelledby="launch-title">
+    <p class="eyebrow">GOOGLE 3D / EVALUATION ONLY</p>
+    <h2 id="launch-title">Explore Toronto Zoo in Google 3D</h2>
+    <p>Google streams this scene when you open it. All visitors share the project’s daily Demo Key quota. If that limit is reached, the view may be unavailable until the next daily reset.</p>
+    <button id="load-google" disabled>Open Google 3D</button>
+    <a class="gis-link alternate" href="../">Open the GIS-based demo instead</a>
+    <p class="fine-print">Internet and a browser with WebGL are required. <a href="https://developers.google.com/maps/demo-key" target="_blank" rel="noopener noreferrer">About the quota</a> · <a href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer">Google privacy</a></p>
+  </section>
   <section id="message" class="message" hidden>
     <p class="eyebrow">GOOGLE 3D PREVIEW</p>
     <h2 id="message-title"></h2>
     <p id="message-text"></p>
     <button id="retry">Check again</button>
+    <a class="gis-link alternate" href="../">Open the GIS-based demo</a>
   </section>
   <script type="module" src="app.js"></script>
 </body>

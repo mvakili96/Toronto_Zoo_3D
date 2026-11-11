@@ -89,9 +89,17 @@ available through their original launch commands. This experiment displays
 Google's combined scene instead. It does not provide independent tree/building
 layer toggles or transfer Google's geometry into the existing dataset.
 
-The experiment is outside `public/` and is excluded from the GitHub Pages build.
-The Python configuration endpoint is for local use. Publishing a Google-based
-view would need its own deployment configuration and a suitable production key.
+The same preview is packaged separately at `google-3d/` by the GitHub Pages
+build. The Python configuration endpoint is only used locally. The static build
+uses public settings from `scripts/google_3d_config.py` and an explicitly supplied
+`GOOGLE_MAPS_API_KEY` build environment variable. It never reads `.env`.
+
+The welcome screen requires an explicit **Open Google 3D** click before loading
+Google, and the daily quota notice remains visible in the map panel. A missing
+hosted key produces a visitor-friendly availability message and GIS link.
+See [publishing instructions](PUBLISHING.md#enable-the-google-evaluation) for the
+required key restrictions and Actions secret. A Demo Key is only for evaluation
+and testing, with all visitors sharing its daily limits.
 
 Verification
 -------------
@@ -112,6 +120,15 @@ JavaScript or console errors. These checks exercise wheel zoom, range limits,
 camera and focus at each study edge, native dragging, reset and phone controls.
 The overview and pavilion screenshots were also inspected.
 
+The prepared Pages version later passed 31 live Google browser checks at the
+intended GitHub Pages origin, with the website files supplied locally by the
+test browser. This is a prepublication check, not proof of a live deployment.
+Thirteen offline browser checks covered the quota welcome, network/access
+errors, missing hosted key and phone layout. The combined package also passed
+all 26 existing GIS browser checks and nine packaging checks. A clean checkout
+built byte-identically without GIS inputs, and a canary `.env` value never
+entered the output. The actual browser key is absent from Git-visible source.
+
 During verification, a lower native altitude ceiling caused Google to shorten
 the overhead range before the zoom limit was reached. The 2,800 m ceiling leaves
 room for the 2,400 m range and local surface elevation. The final browser run
@@ -119,8 +136,9 @@ confirmed that zoom stops at the range limit and the zoom-out button disables.
 
 Screenshots and the latest results are saved in `reports/google-3d/`.
 Missing-key guidance makes no Google requests. The local server rejects
-cross-origin configuration access, and the existing GitHub Pages package
-excludes the experiment and credentials.
+cross-origin configuration access. The GitHub Pages package includes the
+Google view's web files and a browser configuration, but excludes `.env`, the
+Python server and local inputs.
 
 References: [Maps Demo Key](https://developers.google.com/maps/demo-key),
 [Google 3D Maps setup](https://developers.google.com/maps/documentation/javascript/3d/get-started),

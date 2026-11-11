@@ -16,13 +16,18 @@ ROOT = Path(__file__).resolve().parents[1]
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--url", default="http://localhost:8002/")
+    parser.add_argument("--output-dir", type=Path, default=ROOT / "reports/google-3d")
+    parser.add_argument("--site-dir", type=Path, help="Serve this prepared Google view locally inside the browser at --url for a prepublication check.")
     args = parser.parse_args()
-    out = ROOT / "reports/google-3d"
+    out = args.output_dir
     out.mkdir(parents=True, exist_ok=True)
     key = read_key()
     # Keep credentials out of test output. Only these public settings are used.
-    with urlopen(urljoin(args.url, "config.json"), timeout=10) as response:
-        config = json.load(response)
+    if args.site_dir:
+        config = json.loads((args.site_dir / "config.json").read_text())
+    else:
+        with urlopen(urljoin(args.url, "config.json"), timeout=10) as response:
+            config = json.load(response)
     if "navigation" not in config:
         parser.error("The running preview uses the previous server code. Restart it or select the updated server with --url.")
     views, bounds, limits = config["views"], config["bounds"], config["navigation"]
@@ -44,6 +49,9 @@ def main():
 
     # These routes must never expose local credentials or original GIS inputs.
     for path in (".env", ".git/config", "maria/", "elevation/", "buildings/"):
+        if args.site_dir:
+            check("Private/input path absent from the Google package: " + path, not (args.site_dir / path).exists())
+            continue
         try:
             with urlopen(urljoin(args.url, path), timeout=10) as response:
                 code = response.status
@@ -59,7 +67,20 @@ def main():
             page.on("pageerror", lambda e: errors.append(clean(e)))
             page.on("console", lambda m: console_errors.append(clean(m.text)) if m.type == "error" else None)
             page.on("response", lambda r: responses.update([(urlsplit(r.url).hostname, r.status)]))
+            if args.site_dir:
+                def serve_local(route):
+                    path = urlsplit(route.request.url).path[len(urlsplit(args.url).path):] or "index.html"
+                    types = {"index.html":"text/html", "app.js":"text/javascript", "style.css":"text/css", "config.json":"application/json"}
+                    if path in types:
+                        route.fulfill(path=str(args.site_dir / path), content_type=types[path])
+                    else:
+                        route.fulfill(status=404, body="Not found")
+                page.route(args.url + "**", serve_local)
             page.goto(args.url, wait_until="domcontentloaded", timeout=60000)
+            page.wait_for_function("['awaiting-click','missing-key','error'].includes(document.querySelector('#status').dataset.state)", timeout=30000)
+            check("Daily quota notice is shown before loading Google", page.locator("#launch").is_visible() and "daily" in page.locator("#launch").inner_text().lower())
+            check("No Google requests before the visitor chooses to load", not any(host and (host.endswith('googleapis.com') or host.endswith('gstatic.com')) for host, _ in responses))
+            page.click("#load-google")
             phase = None
             for _ in range(18):
                 page.wait_for_timeout(10000)
@@ -74,6 +95,7 @@ def main():
             check("User's Google key loads the 3D map", phase == "ready")
             page.screenshot(path=str(out / "local-google-overview.png"), timeout=60000)
             check("Google map element exists", page.locator("gmp-map-3d").count() == 1)
+            check("Quota notice and GIS fallback remain available", page.locator('.quota').is_visible() and page.locator('.quota .gis-link').count() == 1)
             check("Native camera bounds match the GIS study area", page.evaluate("""bounds => {
               const actual = document.querySelector('gmp-map-3d').bounds.toJSON();
               return Object.keys(bounds).every(k => Math.abs(actual[k]-bounds[k]) < 1e-8);
@@ -172,6 +194,7 @@ def main():
             check("No JavaScript errors", not errors)
             check("No browser console errors", not console_errors)
             report = {"checks": checks, "passed": all(c["passed"] for c in checks),
+                      "served_from_local_package": bool(args.site_dir),
                       "study_bounds": bounds, "navigation": limits,
                       "page_errors": errors, "console_errors": console_errors,
                       "responses": [{"host": host, "status": status, "count": count}

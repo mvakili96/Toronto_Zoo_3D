@@ -1,13 +1,20 @@
 Toronto Zoo Landscape Explorer
 =============================
 
-[**Open the interactive 3D demo →**](https://mvakili96.github.io/Toronto_Zoo_3D/)
+[**Open the GIS-based 3D demo →**](https://mvakili96.github.io/Toronto_Zoo_3D/) · [**Google photorealistic 3D evaluation →**](https://mvakili96.github.io/Toronto_Zoo_3D/google-3d/)
 
 [![Toronto Zoo interactive viewer in aerial mode](docs/demo-preview.webp)](https://mvakili96.github.io/Toronto_Zoo_3D/)
 
 Explore the Toronto Zoo and its immediate surroundings as an interactive 3D landscape. The pilot covers an approximate 7.5 km² study area, bringing together terrain, aerial imagery, buildings and mapped routes.
 
 The demo runs in your browser with no installation. Orbit, pan, zoom, inspect buildings and toggle layers to explore the scene. Aerial imagery is shown by default, and the 3D woodland layer can be switched on.
+
+Google 3D evaluation
+--------------------
+
+The optional Google view streams Google’s existing photorealistic terrain, buildings and vegetation. It is a separate view of the same study area. It does not add Google geometry to the GIS model described below. Choose **Open Google 3D** on its welcome screen to load the map.
+
+**Daily quota applies.** All visitors share the project’s Google Demo Key allowance. If the daily limit is reached, the Google view may stop working until the next daily reset. The [GIS-based demo](https://mvakili96.github.io/Toronto_Zoo_3D/) remains available without Google access or quota. This Google view is for evaluation and testing. [Google explains the Demo Key limits](https://developers.google.com/maps/demo-key).
 
 How the visualization was created
 ----------------------------------
