@@ -3,21 +3,30 @@ Toronto Zoo Landscape Explorer
 
 [**Open the GIS-based 3D demo →**](https://mvakili96.github.io/Toronto_Zoo_3D/) · [**Google photorealistic 3D evaluation →**](https://mvakili96.github.io/Toronto_Zoo_3D/google-3d/)
 
-[![Toronto Zoo interactive viewer in aerial mode](docs/demo-preview.webp)](https://mvakili96.github.io/Toronto_Zoo_3D/)
+[![GIS-based Toronto Zoo viewer in aerial mode](docs/demo-preview.webp)](https://mvakili96.github.io/Toronto_Zoo_3D/)
 
-Explore the Toronto Zoo and its immediate surroundings as an interactive 3D landscape. The pilot covers an approximate 7.5 km² study area, bringing together terrain, aerial imagery, buildings and mapped routes.
+*Preview of the GIS-based model.*
 
-The demo runs in your browser with no installation. Orbit, pan, zoom, inspect buildings and toggle layers to explore the scene. Aerial imagery is shown by default, and the 3D woodland layer can be switched on.
+Explore the Toronto Zoo and its immediate surroundings through **two separate interactive 3D views** of an approximate 7.5 km² study area. Both run in your browser with no installation.
+
+| View | What you are seeing |
+|---|---|
+| **GIS-based model** | A model we built from elevation, aerial imagery, City building models and mapped geographic features. Its underlying geographic layers remain separately available for modification and further processing. |
+| **Google photorealistic view** | Google’s existing 3D scene, streamed through the Google Maps API. Our code provides the interface and camera controls. It does not provide separate building, tree or road datasets for editing. |
+
+**Google’s geometry and textures are not used to build or enrich the GIS-based model.**
+
+In the **GIS-based demo**, orbit, pan, zoom, inspect buildings and toggle individual layers. Aerial imagery is shown by default, and the illustrative 3D woodland layer can be switched on.
 
 Google 3D evaluation
 --------------------
 
-The optional Google view streams Google’s existing photorealistic terrain, buildings and vegetation. It is a separate view of the same study area. It does not add Google geometry to the GIS model described below. Choose **Open Google 3D** on its welcome screen to load the map.
+The optional Google view displays Google’s terrain, buildings and vegetation together as one scene. Choose **Open Google 3D** on its welcome screen, then explore using zoom, orbit and the camera presets.
 
 **Daily quota applies.** All visitors share the project’s Google Demo Key allowance. If the daily limit is reached, the Google view may stop working until the next daily reset. The [GIS-based demo](https://mvakili96.github.io/Toronto_Zoo_3D/) remains available without Google access or quota. This Google view is for evaluation and testing. [Google explains the Demo Key limits](https://developers.google.com/maps/demo-key).
 
-How the visualization was created
-----------------------------------
+How the GIS-based model was created
+------------------------------------
 
 1. **Build the terrain.** Elevation samples from Ontario’s digital terrain model (DTM) form the 3D ground surface, including the hills, slopes and valleys around the Zoo.
 2. **Texture the ground.** A georeferenced orthophoto from the City of Toronto provides the terrain’s surface colours and texture.
@@ -25,8 +34,8 @@ How the visualization was created
 
 Feature positions come from the geographic datasets. No automated image-based alignment or matching is performed. Selected locations were visually checked against the imagery.
 
-Data sources
--------------
+GIS model data sources
+-----------------------
 
 | Component | Dataset used |
 |---|---|
@@ -36,11 +45,11 @@ Data sources
 | Roads and paths | OpenStreetMap extracts for the Zoo and surrounding Toronto. City of Toronto road and pedestrian centrelines are available as a comparison layer. |
 | Woodland, water, parking, place names and Zoo outline | A separate [OpenStreetMap](https://www.openstreetmap.org/copyright) extract for the study area. |
 
-About the representation
--------------------------
+GIS model limitations
+----------------------
 
 Buildings retain simplified massing geometry. The 3D trees are illustrative models placed within mapped woodland areas, with display choices determining their sizes and spacing. Vegetation coverage is incomplete. Feature colours and estimated route widths help make the layers readable.
 
-Data attribution and terms are available through the [Ontario licence](https://www.ontario.ca/page/open-government-licence-ontario), [Toronto licence](https://open.toronto.ca/open-data-licence/) and [© OpenStreetMap contributors, ODbL](https://www.openstreetmap.org/copyright).
+GIS dataset attribution and terms are available through the [Ontario licence](https://www.ontario.ca/page/open-government-licence-ontario), [Toronto licence](https://open.toronto.ca/open-data-licence/) and [© OpenStreetMap contributors, ODbL](https://www.openstreetmap.org/copyright).
 
 For setup and reproducibility, see the [developer guide](docs/DEVELOPMENT.md). Further source decisions and validation are documented in the [technical handoff](HANDOFF.md).
